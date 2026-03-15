@@ -10,6 +10,19 @@ import { Spinner } from "@/components/ui/spinner"
 import { TrendingUp } from "lucide-react"
 import { RiskResult } from "./risk-result"
 
+declare global {
+  interface Window {
+    puter: {
+      ai: {
+        chat: (
+          prompt: string | Array<{ role: string; content: string }>,
+          options?: { model?: string; stream?: boolean }
+        ) => Promise<{ message?: { content: string | Array<{ text: string }> } } | string>
+      }
+    }
+  }
+}
+
 const popularCoins = [
   { value: "BTC", label: "Bitcoin (BTC)" },
   { value: "ETH", label: "Ethereum (ETH)" },
@@ -50,24 +63,53 @@ export function TradeForm() {
     setResult(null)
 
     try {
-      const response = await fetch('/api/trade-risk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          coin,
-          amount: parseFloat(amount),
-          leverage: parseInt(leverage),
-        }),
-      })
+      const prompt = `You are a crypto trading risk analyst. Analyze this trade and respond ONLY with valid JSON (no markdown, no code blocks):
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze trade')
+Trade Details:
+- Coin: ${coin}
+- Amount: $${amount} USD
+- Leverage: ${leverage}x
+
+Respond with this exact JSON structure:
+{
+  "riskScore": <number 1-10>,
+  "riskLevel": "<Low|Medium|High|Extreme>",
+  "explanation": "<2-3 sentence explanation of the risk>",
+  "saferAlternative": {
+    "suggestedLeverage": <number>,
+    "suggestedAmount": <number>,
+    "reasoning": "<why this is safer>"
+  },
+  "warnings": ["<warning 1>", "<warning 2>"]
+}
+
+Risk guidelines:
+- Leverage 1-3x with <$1000: Low risk (score 1-3)
+- Leverage 5-10x or >$5000: Medium risk (score 4-6)
+- Leverage 20x+ or >$10000: High risk (score 7-8)
+- Leverage 50x+ or extreme amounts: Extreme risk (score 9-10)`
+
+      const response = await window.puter.ai.chat(prompt, { model: "gpt-4.1-nano" })
+      
+      let content = ""
+      if (typeof response === "string") {
+        content = response
+      } else if (response?.message?.content) {
+        if (Array.isArray(response.message.content)) {
+          content = response.message.content.map((c: { text: string }) => c.text).join("")
+        } else {
+          content = response.message.content as string
+        }
       }
 
-      const data = await response.json()
+      // Clean up any markdown code blocks
+      content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+      
+      const data = JSON.parse(content)
       setResult(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error("Trade analysis error:", err)
+      setError(err instanceof Error ? err.message : 'Failed to analyze trade. Please try again.')
     } finally {
       setIsLoading(false)
     }

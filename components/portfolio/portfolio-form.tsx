@@ -10,6 +10,19 @@ import { Spinner } from "@/components/ui/spinner"
 import { PieChart, Plus, Trash2 } from "lucide-react"
 import { PortfolioResult } from "./portfolio-result"
 
+declare global {
+  interface Window {
+    puter: {
+      ai: {
+        chat: (
+          prompt: string | Array<{ role: string; content: string }>,
+          options?: { model?: string; stream?: boolean }
+        ) => Promise<{ message?: { content: string | Array<{ text: string }> } } | string>
+      }
+    }
+  }
+}
+
 const availableCoins = [
   "BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "AVAX", 
   "DOT", "MATIC", "LINK", "UNI", "ATOM", "LTC", "SHIB"
@@ -84,20 +97,60 @@ export function PortfolioForm() {
     setResult(null)
 
     try {
-      const response = await fetch('/api/portfolio', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ allocations }),
-      })
+      const portfolioDescription = allocations
+        .map(a => `${a.coin}: ${a.percentage}%`)
+        .join(", ")
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze portfolio')
+      const prompt = `You are a crypto portfolio analyst. Analyze this portfolio and respond ONLY with valid JSON (no markdown, no code blocks):
+
+Portfolio Allocation:
+${portfolioDescription}
+
+Respond with this exact JSON structure:
+{
+  "riskLevel": "<Low|Medium|High>",
+  "diversificationScore": <number 1-10>,
+  "overallAssessment": "<2-3 sentence assessment>",
+  "suggestions": [
+    {
+      "action": "<increase|decrease|hold>",
+      "asset": "<coin symbol>",
+      "currentAllocation": <current percentage>,
+      "suggestedAllocation": <suggested percentage>,
+      "reason": "<brief reason>"
+    }
+  ],
+  "strengths": ["<strength 1>", "<strength 2>"],
+  "weaknesses": ["<weakness 1>", "<weakness 2>"]
+}
+
+Guidelines:
+- BTC/ETH heavy portfolios are generally lower risk
+- Meme coins (DOGE, SHIB) increase risk
+- Good diversification has 4-6 assets with no single asset >50%
+- Consider market cap and volatility of each asset`
+
+      const response = await window.puter.ai.chat(prompt, { model: "gpt-4.1-nano" })
+      
+      let content = ""
+      if (typeof response === "string") {
+        content = response
+      } else if (response?.message?.content) {
+        if (Array.isArray(response.message.content)) {
+          content = response.message.content.map((c: { text: string }) => c.text).join("")
+        } else {
+          content = response.message.content as string
+        }
       }
 
-      const data = await response.json()
+      // Clean up any markdown code blocks
+      content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+      
+      const data = JSON.parse(content)
       setResult(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error("Portfolio analysis error:", err)
+      setError(err instanceof Error ? err.message : 'Failed to analyze portfolio. Please try again.')
     } finally {
       setIsLoading(false)
     }
