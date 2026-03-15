@@ -1,17 +1,38 @@
-OpenClaw AI Guardian is positioned as an **AI-powered trading assistant** specifically designed for cryptocurrency trading on Binance. Its core purpose is to help users trade more safely by providing intelligent insights and real-time data.
+# OpenClaw AI Guardian
 
-The platform offers a suite of features aimed at both protecting and informing traders:
-*   **Real-time Risk Analysis**: Continuously assesses market conditions and portfolio risk.
-*   **Portfolio Optimization**: Provides AI-driven suggestions to improve your crypto portfolio.
-*   **Whale Alerts**: Monitors the blockchain for large, market-moving transactions by major holders ("whales") and delivers instant alerts.
-*   **Crypto Education**: Offers guidance and expert knowledge to help users make informed decisions.
+**Trade Safer with OpenClaw AI Guardian** is an intelligent cryptocurrency trading assistant built on **Puter**. It provides real-time market analysis, portfolio insights, and whale alerts through an AI-powered dashboard designed for Binance traders.
 
-### Key Information from the Dashboard
-The landing page provides a snapshot of the current market through its dashboard:
-*   **Market Overview**: Displays key prices like **BTC at $67,234.50** and **ETH at $3,456.78**, with their recent percentage changes.
-*   **Market Sentiment**: Currently shows a "Bullish" sentiment with a "Fear & Greed" index of 72, indicating a state of greed in the market.
-*   **Risk Level**: The overall market risk is assessed as **Moderate**, with a note that the "Market [is] stable."
-*   **Live Whale Alerts**: A feed shows recent large transactions, including a bullish $12M ETH purchase and a bearish $5M SOL sale, complete with timestamps.
+## 🚀 Overview
 
-### In Summary
-OpenClaw AI Guardian aims to be a comprehensive, AI-driven companion for crypto traders. It combines market monitoring, risk assessment, and portfolio management tools with specific alerts for large transactions, all presented through a clean, real-time interface to help users navigate the volatility of the crypto market.
+This project leverages **Puter's cloud platform** to deliver a responsive, real-time trading dashboard. It combines live market data with AI-driven features to help users make safer, more informed trading decisions in the crypto markets.
+
+The application showcases key information and tools including:
+*   **Live Market Data:** Real-time BTC and ETH prices with price change percentages
+*   **Market Sentiment Analysis:** Fear & Greed index (currently 72 - "Greed") and risk level assessment
+*   **AI Guardian Features:** Risk analysis, portfolio optimization, real-time alerts, and crypto education
+*   **Whale Alert System:** Live feed of large transactions with sentiment analysis (bullish/bearish/neutral)
+
+## ✨ Core Features
+
+*   **AI-Powered Risk Analysis:** Real-time risk assessment for your trading positions
+*   **Portfolio Optimization:** Smart suggestions to maximize returns while minimizing risk
+*   **Real-Time Whale Alerts:** Instant notifications about large market-moving transactions
+*   **Crypto Education:** Built-in guidance for traders of all experience levels
+*   **Market Sentiment Tracking:** Fear & Greed index and overall market mood analysis
+
+## 🛠️ Built With Puter
+
+This project is built and deployed on **Puter**, utilizing its cloud infrastructure for:
+- **Serverless deployment** on Puter's cloud platform
+- **Real-time data processing** for market updates and whale alerts
+- **Scalable backend services** to handle live data streams
+- **Secure API integration** with Binance and other data sources
+
+## 🚦 Local Development
+
+To run this project locally with Puter:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/open-claw-sigma.git
+   cd open-claw-sigma
